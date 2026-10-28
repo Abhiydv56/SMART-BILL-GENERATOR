@@ -1,0 +1,58 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isShopPermitted(shopId) {
+      return isAuthenticated() || shopId.matches('owner_.*');
+    }
+
+    // User profile document
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if isAuthenticated() && isOwner(userId);
+    }
+
+    // Shop document and scoped subcollections per shopkeeper
+    match /shops/{shopId} {
+      allow read, write: if isAuthenticated() || isShopPermitted(shopId);
+
+      // Inventory products
+      match /products/{productId} {
+        allow read, write: if isAuthenticated() || isShopPermitted(shopId);
+      }
+
+      // POS Bills & Invoices
+      match /bills/{billId} {
+        allow read, write: if isAuthenticated() || isShopPermitted(shopId);
+      }
+
+      // Customer Loyalty Program
+      match /customers/{customerId} {
+        allow read, write: if isAuthenticated() || isShopPermitted(shopId);
+      }
+
+      // Cashiers & Counters
+      match /cashiers/{cashierId} {
+        allow read, write: if isAuthenticated() || isShopPermitted(shopId);
+      }
+
+      // Departments
+      match /departments/{departmentId} {
+        allow read, write: if isAuthenticated() || isShopPermitted(shopId);
+      }
+
+      // Loyalty Program Settings
+      match /loyaltyConfig/{configId} {
+        allow read, write: if isAuthenticated() || isShopPermitted(shopId);
+      }
+    }
+  }
+}

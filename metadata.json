@@ -1,0 +1,11 @@
+{
+  "name": "Smart Bill Generator",
+  "description": "Fast GST POS billing, inventory management, and multi-counter sales reports for Indian retail shops and shopping malls.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
